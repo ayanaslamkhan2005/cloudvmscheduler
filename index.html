@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloud VM Scheduling Simulator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">☁</div>
+
+        <div>
+          <h1>Cloud VM Scheduling Simulator</h1>
+          <p>VM placement & resource allocation</p>
+        </div>
+      </div>
+
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        Simulator Online
+      </div>
+    </header>
+
+
+    <main class="container">
+
+      <!-- HERO -->
+      <section class="hero">
+        <div>
+          <span class="eyebrow">CLOUD COMPUTING PROJECT</span>
+
+          <h2>
+            Allocate virtual machines across cloud hosts.
+          </h2>
+
+          <p>
+            Build a small cloud, choose a scheduling algorithm,
+            and see how CPU and RAM resources are distributed in real time.
+          </p>
+        </div>
+
+        <div class="hero-icon">⌁</div>
+      </section>
+
+
+      <!-- STATISTICS -->
+      <section class="stats-grid">
+
+        <div class="stat-card">
+          <span>Total Hosts</span>
+          <strong id="statHosts">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Total VMs</span>
+          <strong id="statVMs">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Scheduled</span>
+          <strong id="statScheduled">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Failed</span>
+          <strong id="statFailed">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Avg CPU</span>
+          <strong id="statCpu">0%</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Avg RAM</span>
+          <strong id="statRam">0%</strong>
+        </div>
+
+      </section>
+
+
+      <!-- SCHEDULER CONTROLS -->
+      <section class="control-panel panel">
+
+        <div class="panel-heading">
+
+          <div>
+            <span class="section-kicker">
+              CONTROL CENTER
+            </span>
+
+            <h3>
+              Run the scheduler
+            </h3>
+          </div>
+
+          <div
+            class="algorithm-chip"
+            id="selectedAlgorithmChip"
+          >
+            First Fit
+          </div>
+
+        </div>
+
+
+        <div class="controls">
+
+          <label class="field">
+
+            <span>
+              Scheduling Algorithm
+            </span>
+
+            <select id="algorithmSelect">
+
+              <option value="first-fit">
+                First Fit
+              </option>
+
+              <option value="best-fit">
+                Best Fit
+              </option>
+
+              <option value="load-balanced">
+                Load Balanced
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <button
+            class="btn primary"
+            id="runBtn"
+          >
+            ▶ Run Scheduler
+          </button>
+
+
+          <button
+            class="btn secondary"
+            id="sampleBtn"
+          >
+            ✦ Generate Example
+          </button>
+
+
+          <button
+            class="btn ghost"
+            id="compareBtn"
+          >
+            Compare Algorithms
+          </button>
+
+
+          <button
+            class="btn danger"
+            id="resetBtn"
+          >
+            Reset
+          </button>
+
+        </div>
+
+
+        <!-- ALGORITHM DESCRIPTION -->
+        <div
+          class="algorithm-info"
+          id="algorithmInfo"
+        ></div>
+
+      </section>
+
+
+
+      <!-- HOSTS + VMS -->
+      <section class="two-column">
+
+
+        <!-- HOSTS -->
+        <div class="panel">
+
+          <div class="panel-heading compact">
+
+            <div>
+              <span class="section-kicker">
+                INFRASTRUCTURE
+              </span>
+
+              <h3>
+                Cloud Hosts
+              </h3>
+            </div>
+
+            <div class="heading-actions">
+
+              <span
+                class="count-pill"
+                id="hostCount"
+              >
+                0
+              </span>
+
+              <button
+                class="btn small primary"
+                id="addHostBtn"
+              >
+                + Add Host
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="hostsList"
+            class="list"
+          ></div>
+
+        </div>
+
+
+
+        <!-- VMS -->
+        <div class="panel">
+
+          <div class="panel-heading compact">
+
+            <div>
+              <span class="section-kicker">
+                WORKLOAD
+              </span>
+
+              <h3>
+                Virtual Machines
+              </h3>
+            </div>
+
+
+            <div class="heading-actions">
+
+              <span
+                class="count-pill"
+                id="vmCount"
+              >
+                0
+              </span>
+
+              <button
+                class="btn small primary"
+                id="addVmBtn"
+              >
+                + Add VM
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="vmsList"
+            class="list"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- CLOUD VISUALIZATION -->
+      <section class="panel">
+
+        <div class="panel-heading compact">
+
+          <div>
+
+            <span class="section-kicker">
+              LIVE VIEW
+            </span>
+
+            <h3>
+              Cloud Infrastructure
+            </h3>
+
+          </div>
+
+
+          <span
+            class="subtle"
+            id="lastRunText"
+          >
+            Not scheduled yet
+          </span>
+
+        </div>
+
+
+        <div
+          id="cloudView"
+          class="cloud-grid"
+        ></div>
+
+      </section>
+
+
+
+      <!-- RESULTS -->
+      <section class="panel">
+
+        <div class="panel-heading compact">
+
+          <div>
+
+            <span class="section-kicker">
+              RESULTS
+            </span>
+
+            <h3>
+              VM Scheduling Results
+            </h3>
+
+          </div>
+
+
+          <span
+            class="subtle"
+            id="resultSummary"
+          >
+            0 VMs processed
+          </span>
+
+        </div>
+
+
+        <div class="table-wrap">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>VM</th>
+                <th>CPU</th>
+                <th>RAM</th>
+                <th>Priority</th>
+                <th>Assigned Host</th>
+                <th>Status</th>
+              </tr>
+
+            </thead>
+
+
+            <tbody id="resultsBody"></tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- COMPARISON -->
+      <section class="panel comparison-panel">
+
+        <div class="panel-heading compact">
+
+          <div>
+
+            <span class="section-kicker">
+              ANALYSIS
+            </span>
+
+            <h3>
+              Algorithm Comparison
+            </h3>
+
+          </div>
+
+
+          <span class="subtle">
+            Same workload, different placement strategy
+          </span>
+
+        </div>
+
+
+        <div
+          id="comparisonEmpty"
+          class="empty-state"
+        >
+          Click <strong>Compare Algorithms</strong>
+          to run all three strategies on the same input.
+        </div>
+
+
+        <div
+          id="comparisonContent"
+          class="hidden"
+        >
+
+          <div class="comparison-table-wrap">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>Algorithm</th>
+                  <th>Scheduled</th>
+                  <th>Failed</th>
+                  <th>Avg CPU</th>
+                  <th>Avg RAM</th>
+                  <th>Load Imbalance</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="comparisonBody"></tbody>
+
+            </table>
+
+          </div>
+
+
+          <div
+            class="mini-chart"
+            id="comparisonChart"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- FOOTER -->
+      <footer>
+
+        <span>
+          Cloud VM Scheduling Simulator
+        </span>
+
+        <span>
+          Runs entirely in your browser • Suitable for AWS static hosting
+        </span>
+
+      </footer>
+
+    </main>
+
+  </div>
+
+
+
+  <!-- MODAL -->
+  <div
+    class="modal-backdrop hidden"
+    id="modalBackdrop"
+  >
+
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+    >
+
+      <button
+        class="modal-close"
+        id="modalClose"
+      >
+        ×
+      </button>
+
+      <div id="modalContent"></div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- TOAST MESSAGE -->
+  <div
+    id="toast"
+    class="toast"
+  ></div>
+
+
+
+  <script src="script.js"></script>
+
+</body>
+</html>
